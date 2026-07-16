@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import subjectService from '../../services/subjectService'
 
 const Subjects = () => {
+  const { t } = useTranslation()
   const [subjects, setSubjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -48,12 +50,12 @@ const Subjects = () => {
       setShowModal(false)
       fetchSubjects()
     } catch (err) {
-      setError(err.response?.data?.message || 'Une erreur est survenue')
+      setError(err.response?.data?.message || t('common.error'))
     }
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Supprimer cette matière ?')) return
+    if (!window.confirm(t('subjects.confirmDelete'))) return
     try {
       await subjectService.delete(id)
       fetchSubjects()
@@ -74,19 +76,19 @@ const Subjects = () => {
     <div>
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Matières</h1>
-          <p className="text-sm text-gray-400 mt-1">{subjects.length} matière(s)</p>
+          <h1 className="text-xl font-semibold text-gray-800">{t('subjects.title')}</h1>
+          <p className="text-sm text-gray-400 mt-1">{t('subjects.count', { count: subjects.length })}</p>
         </div>
         <button onClick={openCreate}
           className="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg text-sm font-medium cursor-pointer">
-          + Ajouter une matière
+          {t('subjects.add')}
         </button>
       </div>
 
-      {loading ? <p className="text-gray-400">Chargement...</p> : (
+      {loading ? <p className="text-gray-400">{t('common.loading')}</p> : (
         <div className="grid grid-cols-3 gap-4">
           {subjects.length === 0 ? (
-            <p className="text-gray-400 col-span-3 text-center py-10">Aucune matière trouvée</p>
+            <p className="text-gray-400 col-span-3 text-center py-10">{t('subjects.noSubjects')}</p>
           ) : subjects.map((subject, i) => (
             <div key={subject.id} className={`bg-white border rounded-xl p-5 ${colors[i % colors.length].split(' ')[1]}`}>
               <div className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mb-3 ${colors[i % colors.length]}`}>
@@ -96,11 +98,11 @@ const Subjects = () => {
               <div className="flex gap-2">
                 <button onClick={() => openEdit(subject)}
                   className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 cursor-pointer">
-                  Modifier
+                  {t('common.edit')}
                 </button>
                 <button onClick={() => handleDelete(subject.id)}
                   className="px-3 py-1 bg-red-50 text-red-600 rounded-md text-xs font-medium hover:bg-red-100 cursor-pointer">
-                  Supprimer
+                  {t('common.delete')}
                 </button>
               </div>
             </div>
@@ -112,14 +114,14 @@ const Subjects = () => {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-[460px] shadow-2xl">
             <h2 className="text-base font-semibold text-gray-800 mb-5">
-              {editSubject ? 'Modifier la matière' : 'Ajouter une matière'}
+              {editSubject ? t('subjects.editTitle') : t('subjects.addTitle')}
             </h2>
             {error && (
               <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-lg mb-4">{error}</div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Nom</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">{t('common.name')}</label>
                 <input
                   type="text"
                   value={form.nom}
@@ -129,7 +131,7 @@ const Subjects = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1.5">Description</label>
+                <label className="block text-xs font-medium text-gray-700 mb-1.5">{t('common.description')}</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -139,11 +141,11 @@ const Subjects = () => {
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setShowModal(false)}
                   className="px-4 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit"
                   className="px-4 py-2 bg-blue-700 text-white rounded-lg text-sm font-medium hover:bg-blue-800 cursor-pointer">
-                  {editSubject ? 'Modifier' : 'Ajouter'}
+                  {editSubject ? t('common.edit') : t('common.add')}
                 </button>
               </div>
             </form>

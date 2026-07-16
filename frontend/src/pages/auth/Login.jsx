@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation, Trans } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
+import LanguageSwitcher from '../../components/ui/LanguageSwitcher'
 
 const Login = () => {
   const { login } = useAuth()
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
@@ -26,7 +29,7 @@ const Login = () => {
         navigate('/school/dashboard')
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Email ou mot de passe incorrect.')
+      setError(err.response?.data?.message || t('auth.invalidCredentials'))
     } finally {
       setLoading(false)
     }
@@ -46,31 +49,30 @@ const Login = () => {
       className="min-h-screen flex items-center justify-center p-4"
       style={{ background: 'linear-gradient(135deg, #14263d 0%, #181f2c 50%, #172942 100%)' }}
     >
-      {/* Card */}
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+      <div className="absolute top-4 end-4">
+        <LanguageSwitcher />
+      </div>
 
-        {/* Top Banner */}
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-700 to-blue-900 px-8 py-6 text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-blue-700 font-bold text-lg shadow">
               E
             </div>
-            <span className="text-white text-xl font-bold">EduPrim</span>
+            <span className="text-white text-xl font-bold">{t('common.appName')}</span>
           </div>
           <p className="text-blue-200 text-xs mt-1">
-            Plateforme de gestion des écoles primaires
+            {t('common.appTagline')}
           </p>
         </div>
 
-        {/* Form Area */}
         <div className="px-8 py-8">
-
           {!showForgot ? (
             <>
               <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Connexion</h2>
+                <h2 className="text-xl font-bold text-gray-800">{t('auth.login')}</h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  Accédez à votre espace administrateur
+                  {t('auth.loginSubtitle')}
                 </p>
               </div>
 
@@ -84,16 +86,16 @@ const Login = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Adresse email
+                    {t('auth.email')}
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">📧</span>
+                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">📧</span>
                     <input
                       type="email"
-                      placeholder="nom@ecole.ma"
+                      placeholder={t('auth.emailPlaceholder')}
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      className="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
+                      className="w-full ps-9 pe-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
                       required
                     />
                   </div>
@@ -101,22 +103,22 @@ const Login = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Mot de passe
+                    {t('auth.password')}
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔒</span>
+                    <span className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔒</span>
                     <input
                       type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={form.password}
                       onChange={(e) => setForm({ ...form, password: e.target.value })}
-                      className="w-full pl-9 pr-10 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
+                      className="w-full ps-9 pe-10 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                      className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
                     >
                       {showPassword ? '🙈' : '👁️'}
                     </button>
@@ -126,14 +128,14 @@ const Login = () => {
                 <div className="flex items-center justify-between pt-1">
                   <label className="flex items-center gap-2 text-sm text-gray-500 cursor-pointer">
                     <input type="checkbox" className="rounded" />
-                    Se souvenir de moi
+                    {t('auth.rememberMe')}
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowForgot(true)}
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
                   >
-                    Mot de passe oublié ?
+                    {t('auth.forgotPassword')}
                   </button>
                 </div>
 
@@ -148,14 +150,14 @@ const Login = () => {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                       </svg>
-                      Connexion en cours...
+                      {t('auth.signingIn')}
                     </span>
-                  ) : 'Se connecter →'}
+                  ) : t('auth.signIn')}
                 </button>
               </form>
 
               <p className="text-xs text-center text-gray-400 mt-6">
-                🔐 Accès réservé aux administrateurs autorisés
+                {t('auth.restrictedAccess')}
               </p>
             </>
           ) : (
@@ -164,14 +166,14 @@ const Login = () => {
                 onClick={() => { setShowForgot(false); setForgotSuccess(false); setForgotEmail('') }}
                 className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6 cursor-pointer"
               >
-                ← Retour
+                ← {t('common.back')}
               </button>
 
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🔑</div>
-                <h2 className="text-xl font-bold text-gray-800">Mot de passe oublié</h2>
+                <h2 className="text-xl font-bold text-gray-800">{t('auth.forgotTitle')}</h2>
                 <p className="text-gray-400 text-sm mt-1">
-                  Entrez votre email pour recevoir un lien de réinitialisation.
+                  {t('auth.forgotSubtitle')}
                 </p>
               </div>
 
@@ -179,16 +181,16 @@ const Login = () => {
                 <form onSubmit={handleForgot} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Adresse email
+                      {t('auth.email')}
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">📧</span>
+                      <span className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">📧</span>
                       <input
                         type="email"
-                        placeholder="nom@ecole.ma"
+                        placeholder={t('auth.emailPlaceholder')}
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
-                        className="w-full pl-9 pr-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
+                        className="w-full ps-9 pe-4 py-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all"
                         required
                       />
                     </div>
@@ -198,21 +200,21 @@ const Login = () => {
                     disabled={forgotLoading}
                     className="w-full py-3 bg-blue-700 hover:bg-blue-800 disabled:bg-blue-400 text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer"
                   >
-                    {forgotLoading ? 'Envoi en cours...' : 'Envoyer le lien →'}
+                    {forgotLoading ? t('auth.sending') : t('auth.sendLink')}
                   </button>
                 </form>
               ) : (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
                   <div className="text-3xl mb-3">✅</div>
-                  <h3 className="font-semibold text-green-800 mb-1">Email envoyé !</h3>
+                  <h3 className="font-semibold text-green-800 mb-1">{t('auth.emailSent')}</h3>
                   <p className="text-green-600 text-sm">
-                    Un lien a été envoyé à <strong>{forgotEmail}</strong>.
+                    <Trans i18nKey="auth.emailSentMessage" values={{ email: forgotEmail }} components={{ strong: <strong /> }} />
                   </p>
                   <button
                     onClick={() => { setShowForgot(false); setForgotSuccess(false); setForgotEmail('') }}
                     className="mt-4 text-sm text-blue-600 hover:underline cursor-pointer"
                   >
-                    Retour à la connexion
+                    {t('auth.backToLogin')}
                   </button>
                 </div>
               )}
@@ -220,10 +222,9 @@ const Login = () => {
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
           <p className="text-xs text-gray-400">
-            © 2026 EduPrim — Tous droits réservés
+            {t('common.copyright')}
           </p>
         </div>
       </div>

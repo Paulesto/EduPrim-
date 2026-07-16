@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import schoolService from '../../services/schoolService'
 
 const Schools = () => {
+  const { t } = useTranslation()
   const [schools, setSchools] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -48,12 +50,12 @@ const Schools = () => {
       setShowModal(false)
       fetchSchools()
     } catch (err) {
-      setError(err.response?.data?.message || 'Une erreur est survenue')
+      setError(err.response?.data?.message || t('common.error'))
     }
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Supprimer cette école ?')) return
+    if (!window.confirm(t('schools.confirmDelete'))) return
     try {
       await schoolService.delete(id)
       fetchSchools()
@@ -62,27 +64,33 @@ const Schools = () => {
     }
   }
 
+  const tableHeaders = [t('common.name'), t('common.address'), t('common.phone'), t('common.email'), t('common.actions')]
+  const formFields = [
+    { label: t('common.name'), key: 'nom', type: 'text' },
+    { label: t('common.address'), key: 'adresse', type: 'text' },
+    { label: t('common.phone'), key: 'telephone', type: 'text' },
+    { label: t('common.email'), key: 'email', type: 'email' },
+  ]
+
   return (
     <div>
-      {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-semibold text-gray-800">Gestion des écoles</h1>
-          <p className="text-sm text-gray-400 mt-1">{schools.length} école(s)</p>
+          <h1 className="text-xl font-semibold text-gray-800">{t('schools.title')}</h1>
+          <p className="text-sm text-gray-400 mt-1">{t('schools.count', { count: schools.length })}</p>
         </div>
         <button onClick={openCreate}
           className="px-4 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
-          + Nouvelle école
+          {t('schools.add')}
         </button>
       </div>
 
-      {/* Table */}
-      {loading ? <p className="text-gray-400">Chargement...</p> : (
+      {loading ? <p className="text-gray-400">{t('common.loading')}</p> : (
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
-                {['Nom', 'Adresse', 'Téléphone', 'Email', 'Actions'].map(h => (
+                {tableHeaders.map(h => (
                   <th key={h} className="px-4 py-3 text-left text-xs font-medium text-gray-400">{h}</th>
                 ))}
               </tr>
@@ -90,7 +98,7 @@ const Schools = () => {
             <tbody>
               {schools.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-gray-400">Aucune école trouvée</td>
+                  <td colSpan={5} className="px-4 py-8 text-center text-gray-400">{t('schools.noSchools')}</td>
                 </tr>
               ) : schools.map(school => (
                 <tr key={school.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
@@ -102,11 +110,11 @@ const Schools = () => {
                     <div className="flex gap-2">
                       <button onClick={() => openEdit(school)}
                         className="px-3 py-1 bg-blue-50 text-blue-600 rounded-md text-xs font-medium hover:bg-blue-100 cursor-pointer">
-                        Modifier
+                        {t('common.edit')}
                       </button>
                       <button onClick={() => handleDelete(school.id)}
                         className="px-3 py-1 bg-red-50 text-red-600 rounded-md text-xs font-medium hover:bg-red-100 cursor-pointer">
-                        Supprimer
+                        {t('common.delete')}
                       </button>
                     </div>
                   </td>
@@ -117,23 +125,17 @@ const Schools = () => {
         </div>
       )}
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-[460px] shadow-2xl">
             <h2 className="text-base font-semibold text-gray-800 mb-5">
-              {editSchool ? "Modifier l'école" : 'Nouvelle école'}
+              {editSchool ? t('schools.editTitle') : t('schools.addTitle')}
             </h2>
             {error && (
               <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-lg mb-4">{error}</div>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {[
-                { label: 'Nom', key: 'nom', type: 'text' },
-                { label: 'Adresse', key: 'adresse', type: 'text' },
-                { label: 'Téléphone', key: 'telephone', type: 'text' },
-                { label: 'Email', key: 'email', type: 'email' },
-              ].map(field => (
+              {formFields.map(field => (
                 <div key={field.key}>
                   <label className="block text-xs font-medium text-gray-700 mb-1.5">{field.label}</label>
                   <input
@@ -148,11 +150,11 @@ const Schools = () => {
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setShowModal(false)}
                   className="px-4 py-2 border border-gray-200 rounded-lg text-sm cursor-pointer hover:bg-gray-50">
-                  Annuler
+                  {t('common.cancel')}
                 </button>
                 <button type="submit"
                   className="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800 cursor-pointer">
-                  {editSchool ? 'Modifier' : 'Créer'}
+                  {editSchool ? t('common.edit') : t('common.create')}
                 </button>
               </div>
             </form>

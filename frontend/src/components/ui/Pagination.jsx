@@ -1,14 +1,18 @@
+import { useTranslation } from 'react-i18next'
+
 const Pagination = ({ pagination, onPageChange }) => {
+  const { t } = useTranslation()
+
   if (!pagination || pagination.last_page <= 1) return null
 
   const pages = Array.from({ length: pagination.last_page }, (_, i) => i + 1)
+  const from = ((pagination.current_page - 1) * pagination.per_page) + 1
+  const to = Math.min(pagination.current_page * pagination.per_page, pagination.total)
 
   return (
     <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100">
       <span className="text-xs text-gray-400">
-        Affichage {((pagination.current_page - 1) * pagination.per_page) + 1} —{' '}
-        {Math.min(pagination.current_page * pagination.per_page, pagination.total)} sur{' '}
-        {pagination.total} résultats
+        {t('pagination.showing', { from, to, total: pagination.total })}
       </span>
       <div className="flex gap-1">
         <button

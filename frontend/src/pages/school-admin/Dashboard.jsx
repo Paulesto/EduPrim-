@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../services/api'
 
 const SchoolDashboard = () => {
-  const { user } = useAuth()
+  const { t } = useTranslation()
   const [stats, setStats] = useState({
     teachers: 0,
     students: 0,
@@ -37,25 +38,22 @@ const SchoolDashboard = () => {
   }, [])
 
   const cards = [
-    { label: 'Élèves inscrits', value: stats.students, icon: '👨‍🎓', color: '#185FA5', bg: '#E6F1FB' },
-    { label: 'Enseignants', value: stats.teachers, icon: '👨‍🏫', color: '#3B6D11', bg: '#EAF3DE' },
-    { label: 'Classes', value: stats.classrooms, icon: '🚪', color: '#854F0B', bg: '#FAEEDA' },
-    { label: 'Matières', value: stats.subjects, icon: '📘', color: '#534AB7', bg: '#EEEDFE' },
+    { label: t('dashboard.enrolledStudents'), value: stats.students, icon: '👨‍🎓', color: '#185FA5', bg: '#E6F1FB' },
+    { label: t('dashboard.teachers'), value: stats.teachers, icon: '👨‍🏫', color: '#3B6D11', bg: '#EAF3DE' },
+    { label: t('dashboard.classrooms'), value: stats.classrooms, icon: '🚪', color: '#854F0B', bg: '#FAEEDA' },
+    { label: t('dashboard.subjects'), value: stats.subjects, icon: '📘', color: '#534AB7', bg: '#EEEDFE' },
   ]
 
   return (
     <div>
       <div style={{ marginBottom: '24px' }}>
         <h1 style={{ fontSize: '20px', fontWeight: '600', color: '#222' }}>
-          Tableau de bord de votre école
+          {t('dashboard.schoolTitle')}
         </h1>
-        <p style={{ fontSize: '13px', color: '#999', marginTop: '4px' }}>
-          
-        </p>
       </div>
 
       {loading ? (
-        <div style={{ color: '#999' }}>Chargement...</div>
+        <div style={{ color: '#999' }}>{t('common.loading')}</div>
       ) : (
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
           {cards.map((card, i) => (
