@@ -8,18 +8,33 @@ use Illuminate\Http\Request;
 
 class TeacherController extends Controller
 {
-    // Liste les enseignants de l'école connectée
     public function index(Request $request)
     {
-        $teachers = Teacher::where('school_id', $request->user()->school_id)
-                           ->get();
+        $query = Teacher::where('school_id', $request->user()->school_id);
+
+        // Recherche par nom ou prénom
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nom', 'like', "%$search%")
+                  ->orWhere('prenom', 'like', "%$search%")
+                  ->orWhere('email', 'like', "%$search%");
+            });
+        }
+
+        $teachers = $query->paginate($request->get('per_page', 10));
 
         return response()->json([
-            'teachers' => $teachers
+            'teachers' => $teachers->items(),
+            'pagination' => [
+                'total'        => $teachers->total(),
+                'per_page'     => $teachers->perPage(),
+                'current_page' => $teachers->currentPage(),
+                'last_page'    => $teachers->lastPage(),
+            ]
         ]);
     }
 
-    // Ajouter un enseignant
     public function store(Request $request)
     {
         $request->validate([
@@ -43,19 +58,15 @@ class TeacherController extends Controller
         ], 201);
     }
 
-    // Détail d'un enseignant
     public function show(Request $request, string $id)
     {
         $teacher = Teacher::where('school_id', $request->user()->school_id)
                           ->with('classrooms')
                           ->findOrFail($id);
 
-        return response()->json([
-            'teacher' => $teacher
-        ]);
+        return response()->json(['teacher' => $teacher]);
     }
 
-    // Modifier un enseignant
     public function update(Request $request, string $id)
     {
         $teacher = Teacher::where('school_id', $request->user()->school_id)
@@ -68,9 +79,7 @@ class TeacherController extends Controller
             'telephone' => 'sometimes|string',
         ]);
 
-        $teacher->update($request->only([
-            'nom', 'prenom', 'email', 'telephone'
-        ]));
+        $teacher->update($request->only(['nom', 'prenom', 'email', 'telephone']));
 
         return response()->json([
             'message' => 'Enseignant modifié avec succès.',
@@ -78,15 +87,12 @@ class TeacherController extends Controller
         ]);
     }
 
-    // Supprimer un enseignant
     public function destroy(Request $request, string $id)
     {
         $teacher = Teacher::where('school_id', $request->user()->school_id)
                           ->findOrFail($id);
         $teacher->delete();
 
-        return response()->json([
-            'message' => 'Enseignant supprimé avec succès.'
-        ]);
+        return response()->json(['message' => 'Enseignant supprimé avec succès.']);
     }
 }

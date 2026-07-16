@@ -4,21 +4,45 @@ namespace App\Http\Controllers\SchoolAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
-use App\Models\Classroom;
 use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $students = Student::whereHas('classroom', function ($query) use ($request) {
-                                $query->where('school_id', $request->user()->school_id);
-                            })
-                           ->with('classroom')
-                           ->get();
+        $query = Student::whereHas('classroom', function ($q) use ($request) {
+            $q->where('school_id', $request->user()->school_id);
+        })->with('classroom');
+
+        // Recherche par nom ou prénom
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nom', 'like', "%$search%")
+                  ->orWhere('prenom', 'like', "%$search%");
+            });
+        }
+
+        // Filtre par classe
+        if ($request->has('classroom_id') && $request->classroom_id) {
+            $query->where('classroom_id', $request->classroom_id);
+        }
+
+        // Filtre par sexe
+        if ($request->has('sexe') && $request->sexe) {
+            $query->where('sexe', $request->sexe);
+        }
+
+        $students = $query->paginate($request->get('per_page', 10));
 
         return response()->json([
-            'students' => $students
+            'students' => $students->items(),
+            'pagination' => [
+                'total'        => $students->total(),
+                'per_page'     => $students->perPage(),
+                'current_page' => $students->currentPage(),
+                'last_page'    => $students->lastPage(),
+            ]
         ]);
     }
 
@@ -47,23 +71,18 @@ class StudentController extends Controller
 
     public function show(Request $request, string $id)
     {
-        $student = Student::whereHas('classroom', function ($query) use ($request) {
-                               $query->where('school_id', $request->user()->school_id);
-                           })
-                          ->with('classroom')
-                          ->findOrFail($id);
+        $student = Student::whereHas('classroom', function ($q) use ($request) {
+            $q->where('school_id', $request->user()->school_id);
+        })->with('classroom')->findOrFail($id);
 
-        return response()->json([
-            'student' => $student
-        ]);
+        return response()->json(['student' => $student]);
     }
 
     public function update(Request $request, string $id)
     {
-        $student = Student::whereHas('classroom', function ($query) use ($request) {
-                               $query->where('school_id', $request->user()->school_id);
-                           })
-                          ->findOrFail($id);
+        $student = Student::whereHas('classroom', function ($q) use ($request) {
+            $q->where('school_id', $request->user()->school_id);
+        })->findOrFail($id);
 
         $request->validate([
             'nom'            => 'sometimes|string|max:255',
@@ -88,14 +107,11 @@ class StudentController extends Controller
 
     public function destroy(Request $request, string $id)
     {
-        $student = Student::whereHas('classroom', function ($query) use ($request) {
-                               $query->where('school_id', $request->user()->school_id);
-                           })
-                          ->findOrFail($id);
+        $student = Student::whereHas('classroom', function ($q) use ($request) {
+            $q->where('school_id', $request->user()->school_id);
+        })->findOrFail($id);
         $student->delete();
 
-        return response()->json([
-            'message' => 'Élève supprimé avec succès.'
-        ]);
+        return response()->json(['message' => 'Élève supprimé avec succès.']);
     }
 }
