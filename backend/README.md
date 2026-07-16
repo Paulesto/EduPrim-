@@ -65,7 +65,7 @@ Chaque fois que tu modifies ton projet, il te suffira de faire :
 
 //les commandes github
 git add .
-git commit -m "Description des modifications"
+git commit -m "Commentaire dans readme"
 git push
 
 Par exemple :
