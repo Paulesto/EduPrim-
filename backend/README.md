@@ -57,3 +57,21 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+Chaque fois que tu modifies ton projet, il te suffira de faire :
+
+
+
+
+//les commandes github
+git add .
+git commit -m "Description des modifications"
+git push
+
+Par exemple :
+
+git add .
+git commit -m "Add school management module and improve dashboard"
+git push
+
+Ainsi, toutes tes nouvelles modifications seront sauvegardées sur GitHub. Bravo, ton dépôt est maintenant correctement configuré et synchronisé.
